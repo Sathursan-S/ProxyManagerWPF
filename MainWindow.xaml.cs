@@ -17,6 +17,39 @@ namespace ProxyManagerWPF
             // Set default values or perform any additional initialization here
             txtProxyServer.Text = "10.50.225.222";
             txtProxyPort.Text = "3128";
+
+            // Check the current status of proxy settings
+            CheckStatus();
+        }
+
+        private void CheckStatus()
+        {
+            // check for git proxy settings
+            String gitStatus = RunCommandAndOutput("git config --global --get http.proxy");
+            if (!string.IsNullOrEmpty(gitStatus))
+            {
+                chkGit.IsChecked = true;
+                txtGit.Text = $"Git proxy: {gitStatus}";
+            }
+            else
+            {
+                chkGit.IsChecked = false;
+                txtGit.Text = "Git proxy: Not set";
+            }
+
+
+            // check for npm proxy settings
+            String npmStatus = RunCommandAndOutput("npm config get proxy");
+            if (npmStatus != "null")
+            {
+                chkNpm.IsChecked = true;
+                txtNpm.Text = $"npm proxy: {npmStatus}";
+            }
+            else
+            {
+                chkNpm.IsChecked = false;
+                txtNpm.Text = "npm proxy: Not set";
+            }
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -73,6 +106,8 @@ namespace ProxyManagerWPF
                     AppendToConsole("npm proxy settings removed.");
                 }
 
+                CheckStatus();
+
                 MessageBox.Show("Proxy settings saved and applied.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -97,6 +132,25 @@ namespace ProxyManagerWPF
                 process.WaitForExit();
 
                 Console.WriteLine(output);
+            }
+        }
+
+        private String RunCommandAndOutput(string command)
+        {
+            using (Process process = new Process())
+            {
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.Arguments = $"/c {command}";
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+
+                return output.Trim();
             }
         }
 
