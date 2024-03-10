@@ -14,18 +14,14 @@ namespace ProxyManagerWPF
 
         private void InitializeUI()
         {
-            // Set default values or perform any additional initialization here
             txtProxyServer.Text = "10.50.225.222";
             txtProxyPort.Text = "3128";
-
-            // Check the current status of proxy settings
             CheckStatus();
         }
 
         private void CheckStatus()
         {
-            // check for git proxy settings
-            String gitStatus = RunCommandAndOutput("git config --global --get http.proxy");
+            string gitStatus = RunCommandAndOutput("git config --global --get http.proxy");
             if (!string.IsNullOrEmpty(gitStatus))
             {
                 chkGit.IsChecked = true;
@@ -37,9 +33,7 @@ namespace ProxyManagerWPF
                 txtGit.Text = "Git proxy: Not set";
             }
 
-
-            // check for npm proxy settings
-            String npmStatus = RunCommandAndOutput("npm config get proxy");
+            string npmStatus = RunCommandAndOutput("npm config get proxy");
             if (npmStatus != "null")
             {
                 chkNpm.IsChecked = true;
@@ -57,28 +51,22 @@ namespace ProxyManagerWPF
             txtConsole.Clear();
             try
             {
-                // Parse proxy server and port
                 string proxyServer = txtProxyServer.Text;
                 int proxyPort = int.Parse(txtProxyPort.Text);
 
-                // Create a WebProxy with the specified settings
-                WebProxy proxy = new WebProxy(proxyServer, proxyPort);
+                //WebProxy proxy = new WebProxy(proxyServer, proxyPort);
+                //WebRequest.DefaultWebProxy = proxy;
 
-                // Set the default proxy for all HTTP requests
-                WebRequest.DefaultWebProxy = proxy;
-
-                // Simulate applying proxy settings for Git
                 if (chkGit.IsChecked == true)
                 {
-                    // Set Git proxy settings using the git command-line tool
                     string gitCommand = $"git config --global http.proxy http://{proxyServer}:{proxyPort}";
                     RunCommand(gitCommand);
 
                     Console.WriteLine("Git proxy settings applied.");
                     AppendToConsole("Git proxy settings applied.");
-                } else
+                }
+                else
                 {
-                    // Unset Git proxy settings using the git command-line tool
                     string gitCommand = "git config --global --unset http.proxy";
                     RunCommand(gitCommand);
                     RunCommand("git config --global --unset https.proxy");
@@ -87,18 +75,16 @@ namespace ProxyManagerWPF
                     AppendToConsole("Git proxy settings removed.");
                 }
 
-                // Simulate applying proxy settings for npm
                 if (chkNpm.IsChecked == true)
                 {
-                    // Set npm proxy settings using the npm command-line tool
                     string npmCommand = $"npm config set proxy http://{proxyServer}:{proxyPort}";
                     RunCommand(npmCommand);
                     RunCommand($"npm config set https-proxy http://{proxyServer}:{proxyPort}");
                     Console.WriteLine("npm proxy settings applied.");
                     AppendToConsole("npm proxy settings applied.");
-                }else
+                }
+                else
                 {
-                    // Unset npm proxy settings using the npm command-line tool
                     string npmCommand = "npm config delete proxy";
                     RunCommand(npmCommand);
                     RunCommand("npm config delete https-proxy");
@@ -135,7 +121,7 @@ namespace ProxyManagerWPF
             }
         }
 
-        private String RunCommandAndOutput(string command)
+        private string RunCommandAndOutput(string command)
         {
             using (Process process = new Process())
             {
@@ -154,19 +140,14 @@ namespace ProxyManagerWPF
             }
         }
 
-
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            // Close the window or perform any cancellation logic
             Close();
         }
 
         private void AppendToConsole(string text)
         {
-            // Append the text to the TextBox
             txtConsole.AppendText(text + Environment.NewLine);
-
-            // Scroll to the end of the TextBox to show the latest output
             txtConsole.ScrollToEnd();
         }
     }
