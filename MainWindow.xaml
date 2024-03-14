@@ -4,42 +4,48 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProxyManagerWPF"
+        xmlns:fluent="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d"
-        Title="MainWindow" Height="250" Width="400">
-    <Grid>
+        Title="MainWindow" Height="340.20" Width="394">
+    <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="96"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
+
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Grid.Row="0">
-            <TextBlock Text="E-fac UoR Proxy Manager v1.0" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
-            <TextBlock Text="- Sathu S -" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <fluent:TextBlock Text="E-fac UoR Proxy Manager v1.0" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+            <fluent:TextBlock Text="- Sathu S -" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </StackPanel>
+
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4" HorizontalAlignment="Center" Grid.Row="1">
-            <TextBlock Text="Proxy Server: " VerticalAlignment="Center" />
-            <TextBox x:Name="txtProxyServer" Width="200" Margin="5"/>
-            <TextBlock Text="Port: " VerticalAlignment="Center"/>
-            <TextBox x:Name="txtProxyPort" Width="50" Margin="5"/>
+            <fluent:TextBlock Text="Proxy Server: " VerticalAlignment="Center" />
+            <fluent:TextBox x:Name="txtProxyServer" Width="149" Margin="5"/>
+            <fluent:TextBlock Text="Port: " VerticalAlignment="Center"/>
+            <fluent:TextBox x:Name="txtProxyPort" Width="79" Margin="5"/>
         </StackPanel>
+
         <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Center" Grid.Row="2">
             <StackPanel Margin="2">
-                <CheckBox Content=" Git" Margin="2" x:Name="chkGit"/>
-                <CheckBox Content=" npm" Margin="2" x:Name="chkNpm"/>
+                <fluent:ToggleSwitch  Content=" Git" Margin="2" x:Name="chkGit"/>
+                <fluent:ToggleSwitch  Content=" npm" Margin="2" x:Name="chkNpm"/>
             </StackPanel>
             <StackPanel Margin="2">
-                <TextBlock x:Name="txtGit" Margin="2"/>
-                <TextBlock x:Name="txtNpm" Margin="2"/>
+                <fluent:TextBlock x:Name="txtGit" Margin="2"/>
+                <fluent:TextBlock x:Name="txtNpm" Margin="2"/>
             </StackPanel>
-            </StackPanel>
-        <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" Grid.Row="3">
-            <Button x:Name="btnSave" Content="Save" Width="100" Margin="5" Click="btnSave_Click"/>
-            <Button x:Name="btnCancel" Content="Cancel" Width="100" Margin="5" Click="btnCancel_Click"/>
         </StackPanel>
+
+        <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" Grid.Row="3">
+            <fluent:Button x:Name="btnSave" Content="Save" Width="100" Margin="5" Click="btnSave_Click"/>
+            <fluent:Button x:Name="btnCancel" Content="Cancel" Width="100" Margin="5" Click="btnCancel_Click"/>
+        </StackPanel>
+
         <StackPanel Orientation="Horizontal" Margin="1" HorizontalAlignment="Center" Grid.Row="4">
-            <TextBox VerticalAlignment="Stretch" x:Name="txtConsole" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="3" Margin="7" Height="80" Width="250"/>
+            <fluent:TextBox VerticalAlignment="Stretch" x:Name="txtConsole" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="3" Margin="7" Height="80" Width="250"/>
         </StackPanel>
     </Grid>
 </Window>
