@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ProxyManagerWPF"
         xmlns:fluent="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d"
-        Title="MainWindow" Height="auto" Width="394">
+        Title="Proxy Manager" Height="auto" Width="394">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Grid.Row="0">
-            <fluent:TextBlock Text="E-fac UoR Proxy Manager v1.0" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+            <fluent:TextBlock Text="E-fac UoR Proxy Manager v1.1" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
             <fluent:TextBlock Text="- Sathu S -" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </StackPanel>
 
