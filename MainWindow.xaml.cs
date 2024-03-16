@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Win32;
+using System.Diagnostics;
 using System.Net;
 using System.Windows;
 
@@ -14,13 +15,36 @@ namespace ProxyManagerWPF
 
         private void InitializeUI()
         {
-            txtProxyServer.Text = "10.50.225.222";
-            txtProxyPort.Text = "3128";
+            string proxyServer = Registry.GetValue("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", "ProxyServer", "") as string;
+
+            if (!string.IsNullOrEmpty(proxyServer))
+            {
+                string[] proxyParts = proxyServer.Split(':');
+                txtProxyServer.Text = proxyParts[0];
+                txtProxyPort.Text = proxyParts[1];
+            }
+            else
+            {
+                txtProxyServer.Text = "10.50.225.222";
+                txtProxyPort.Text = "3128";
+            }
+            
             CheckStatus();
         }
 
         private void CheckStatus()
         {
+            int proxyEnable = (int)Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings").GetValue("ProxyEnable");
+            if (proxyEnable == 1)
+            {
+                chkGlobal.IsChecked = true;
+                txtGlobal.Text = "Global proxy: Enabled";
+            }
+            else
+            {
+                chkGlobal.IsChecked = false;
+                txtGlobal.Text = "Global proxy: Disabled";
+            }
             string gitStatus = RunCommandAndOutput("git config --global --get http.proxy");
             if (!string.IsNullOrEmpty(gitStatus))
             {
@@ -56,6 +80,18 @@ namespace ProxyManagerWPF
 
                 //WebProxy proxy = new WebProxy(proxyServer, proxyPort);
                 //WebRequest.DefaultWebProxy = proxy;
+                if (chkGlobal.IsChecked == true)
+                {
+                    RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
+                    registry.SetValue("ProxyEnable", 1);
+                    //registry.SetValue("ProxyServer", $"{proxyServer}:{proxyPort}");
+                }
+                else
+                {
+                    RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
+                    registry.SetValue("ProxyEnable", 0);
+                    //registry.SetValue("ProxyServer", "");
+                }
 
                 if (chkGit.IsChecked == true)
                 {
