@@ -88,7 +88,7 @@ namespace ProxyManagerWPF
                     //registry.SetValue("ProxyServer", $"{proxyServer}:{proxyPort}");
 
                     Environment.SetEnvironmentVariable("HTTP_PROXY", proxySocket, EnvironmentVariableTarget.User);
-                    Environment.SetEnvironmentVariable("HTTPS_PROXY", proxySocket, EnvironmentVariableTarget.User);
+                    Environment.SetEnvironmentVariable("HTTPS_PROXY", $"http://{proxyServer}:{proxyPort}", EnvironmentVariableTarget.User);
                 }
                 else
                 {
