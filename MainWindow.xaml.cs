@@ -77,6 +77,7 @@ namespace ProxyManagerWPF
             {
                 string proxyServer = txtProxyServer.Text;
                 int proxyPort = int.Parse(txtProxyPort.Text);
+                string proxySocket = $"{proxyServer}:{proxyPort}";
 
                 //WebProxy proxy = new WebProxy(proxyServer, proxyPort);
                 //WebRequest.DefaultWebProxy = proxy;
@@ -85,12 +86,18 @@ namespace ProxyManagerWPF
                     RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
                     registry.SetValue("ProxyEnable", 1);
                     //registry.SetValue("ProxyServer", $"{proxyServer}:{proxyPort}");
+
+                    Environment.SetEnvironmentVariable("HTTP_PROXY", proxySocket, EnvironmentVariableTarget.User);
+                    Environment.SetEnvironmentVariable("HTTPS_PROXY", proxySocket, EnvironmentVariableTarget.User);
                 }
                 else
                 {
                     RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
                     registry.SetValue("ProxyEnable", 0);
                     //registry.SetValue("ProxyServer", "");
+
+                    Environment.SetEnvironmentVariable("HTTP_PROXY", null, EnvironmentVariableTarget.User);
+                    Environment.SetEnvironmentVariable("HTTPS_PROXY", null, EnvironmentVariableTarget.User);
                 }
 
                 if (chkGit.IsChecked == true)
