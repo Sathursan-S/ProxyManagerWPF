@@ -77,7 +77,7 @@ namespace ProxyManagerWPF
             {
                 string proxyServer = txtProxyServer.Text;
                 int proxyPort = int.Parse(txtProxyPort.Text);
-                string proxySocket = $"{proxyServer}:{proxyPort}";
+                string proxySocket = $"http://{proxyServer}:{proxyPort}";
 
                 //WebProxy proxy = new WebProxy(proxyServer, proxyPort);
                 //WebRequest.DefaultWebProxy = proxy;
@@ -88,7 +88,7 @@ namespace ProxyManagerWPF
                     //registry.SetValue("ProxyServer", $"{proxyServer}:{proxyPort}");
 
                     Environment.SetEnvironmentVariable("HTTP_PROXY", proxySocket, EnvironmentVariableTarget.User);
-                    Environment.SetEnvironmentVariable("HTTPS_PROXY", $"http://{proxyServer}:{proxyPort}", EnvironmentVariableTarget.User);
+                    Environment.SetEnvironmentVariable("HTTPS_PROXY", proxySocket, EnvironmentVariableTarget.User);
                 }
                 else
                 {
