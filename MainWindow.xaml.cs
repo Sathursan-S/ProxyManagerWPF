@@ -38,41 +38,41 @@ namespace ProxyManagerWPF
             if (proxyEnable == 1)
             {
                 chkGlobal.IsChecked = true;
-                txtGlobal.Text = "Global proxy: Enabled";
+                //txtGlobal.Text = "Global proxy: Enabled";
             }
             else
             {
                 chkGlobal.IsChecked = false;
-                txtGlobal.Text = "Global proxy: Disabled";
+                //txtGlobal.Text = "Global proxy: Disabled";
             }
             string gitStatus = RunCommandAndOutput("git config --global --get http.proxy");
             if (!string.IsNullOrEmpty(gitStatus))
             {
                 chkGit.IsChecked = true;
-                txtGit.Text = $"Git proxy: {gitStatus}";
+                //txtGit.Text = $"Git proxy: {gitStatus}";
             }
             else
             {
                 chkGit.IsChecked = false;
-                txtGit.Text = "Git proxy: Not set";
+                //txtGit.Text = "Git proxy: Not set";
             }
 
             string npmStatus = RunCommandAndOutput("npm config get proxy");
             if (npmStatus != "null")
             {
                 chkNpm.IsChecked = true;
-                txtNpm.Text = $"npm proxy: {npmStatus}";
+                //txtNpm.Text = $"npm proxy: {npmStatus}";
             }
             else
             {
                 chkNpm.IsChecked = false;
-                txtNpm.Text = "npm proxy: Not set";
+                //txtNpm.Text = "npm proxy: Not set";
             }
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            txtConsole.Clear();
+            //txtConsole.Clear();
             try
             {
                 string proxyServer = txtProxyServer.Text;
@@ -83,56 +83,59 @@ namespace ProxyManagerWPF
                 //WebRequest.DefaultWebProxy = proxy;
                 if (chkGlobal.IsChecked == true)
                 {
-                    RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
-                    registry.SetValue("ProxyEnable", 1);
-                    //registry.SetValue("ProxyServer", $"{proxyServer}:{proxyPort}");
+                    GlobalProxyOn(proxySocket);
+                    GitOn(proxyServer, proxyPort);
+                    NpmOn(proxyServer, proxyPort);
 
-                    Environment.SetEnvironmentVariable("HTTP_PROXY", proxySocket, EnvironmentVariableTarget.User);
-                    Environment.SetEnvironmentVariable("HTTPS_PROXY", proxySocket, EnvironmentVariableTarget.User);
+                    chkGlobal.IsChecked = true;
+                    chkGit.IsChecked = true;
+                    chkNpm.IsChecked = true;
                 }
                 else
                 {
-                    RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
-                    registry.SetValue("ProxyEnable", 0);
-                    //registry.SetValue("ProxyServer", "");
+                    GlobalProxyOff();
+                    GitOff();
+                    NpmOff();
 
-                    Environment.SetEnvironmentVariable("HTTP_PROXY", null, EnvironmentVariableTarget.User);
-                    Environment.SetEnvironmentVariable("HTTPS_PROXY", null, EnvironmentVariableTarget.User);
+                    chkGlobal.IsChecked = false;
+                    chkGit.IsChecked = false;
+                    chkNpm.IsChecked = false;
                 }
 
                 if (chkGit.IsChecked == true)
                 {
-                    string gitCommand = $"git config --global http.proxy http://{proxyServer}:{proxyPort}";
-                    RunCommand(gitCommand);
+                    GitOn(proxyServer, proxyPort);
+
+                    chkGit.IsChecked = true;
 
                     Console.WriteLine("Git proxy settings applied.");
-                    AppendToConsole("Git proxy settings applied.");
+                    //AppendToConsole("Git proxy settings applied.");
                 }
                 else
                 {
-                    string gitCommand = "git config --global --unset http.proxy";
-                    RunCommand(gitCommand);
-                    RunCommand("git config --global --unset https.proxy");
+                    GitOff();
+
+                    chkGit.IsChecked = false;
 
                     Console.WriteLine("Git proxy settings removed.");
-                    AppendToConsole("Git proxy settings removed.");
+                    //AppendToConsole("Git proxy settings removed.");
                 }
 
                 if (chkNpm.IsChecked == true)
                 {
-                    string npmCommand = $"npm config set proxy http://{proxyServer}:{proxyPort}";
-                    RunCommand(npmCommand);
-                    RunCommand($"npm config set https-proxy http://{proxyServer}:{proxyPort}");
+                    NpmOn(proxyServer, proxyPort);
+
+                    chkNpm.IsChecked = true;
                     Console.WriteLine("npm proxy settings applied.");
-                    AppendToConsole("npm proxy settings applied.");
+                    //AppendToConsole("npm proxy settings applied.");
                 }
                 else
                 {
-                    string npmCommand = "npm config delete proxy";
-                    RunCommand(npmCommand);
-                    RunCommand("npm config delete https-proxy");
+                    NpmOff();
+
+                    chkNpm.IsChecked = false;
                     Console.WriteLine("npm proxy settings removed.");
-                    AppendToConsole("npm proxy settings removed.");
+                    //AppendToConsole("npm proxy settings removed.");
                 }
 
                 CheckStatus();
@@ -143,6 +146,53 @@ namespace ProxyManagerWPF
             {
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private static void GlobalProxyOff()
+        {
+            RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
+            registry.SetValue("ProxyEnable", 0);
+            //registry.SetValue("ProxyServer", "");
+
+            Environment.SetEnvironmentVariable("HTTP_PROXY", null, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("HTTPS_PROXY", null, EnvironmentVariableTarget.User);
+        }
+
+        private static void GlobalProxyOn(string proxySocket)
+        {
+            RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
+            registry.SetValue("ProxyEnable", 1);
+            //registry.SetValue("ProxyServer", $"{proxyServer}:{proxyPort}");
+
+            Environment.SetEnvironmentVariable("HTTP_PROXY", proxySocket, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("HTTPS_PROXY", proxySocket, EnvironmentVariableTarget.User);
+        }
+
+        private void NpmOff()
+        {
+            string npmCommand = "npm config delete proxy";
+            RunCommand(npmCommand);
+            RunCommand("npm config delete https-proxy");
+        }
+
+        private void NpmOn(string proxyServer, int proxyPort)
+        {
+            string npmCommand = $"npm config set proxy http://{proxyServer}:{proxyPort}";
+            RunCommand(npmCommand);
+            RunCommand($"npm config set https-proxy http://{proxyServer}:{proxyPort}");
+        }
+
+        private void GitOff()
+        {
+            string gitCommand = "git config --global --unset http.proxy";
+            RunCommand(gitCommand);
+            RunCommand("git config --global --unset https.proxy");
+        }
+
+        private void GitOn(string proxyServer, int proxyPort)
+        {
+            string gitCommand = $"git config --global http.proxy http://{proxyServer}:{proxyPort}";
+            RunCommand(gitCommand);
         }
 
         private void RunCommand(string command)
@@ -188,10 +238,10 @@ namespace ProxyManagerWPF
             Close();
         }
 
-        private void AppendToConsole(string text)
-        {
-            txtConsole.AppendText(text + Environment.NewLine);
-            txtConsole.ScrollToEnd();
-        }
+        //private void AppendToConsole(string text)
+        //{
+        //    txtConsole.AppendText(text + Environment.NewLine);
+        //    txtConsole.ScrollToEnd();
+        //}
     }
 }
